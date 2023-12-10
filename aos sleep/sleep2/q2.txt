@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+
+volatile int ctrl_c_count = 0;
+
+void sigint_handler(int signum) {
+    if (ctrl_c_count == 0) {
+        printf("Caught Ctrl-C signal. Press Ctrl-C again to exit.\n");
+        ctrl_c_count++;
+    } else {
+        printf("Exiting program.\n");
+        exit(0);
+    }
+}
+
+int main() {
+    signal(SIGINT, sigint_handler);
+
+    while (1) {
+        // Your main program logic goes here
+    }
+
+    return 0;
+}

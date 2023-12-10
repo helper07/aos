@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main(int argc, char *argv[]) {
+    struct stat fileStat;
+
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    if (stat(argv[1], &fileStat) == -1) {
+        perror("Error getting file information");
+        return 1;
+    }
+
+    printf("Inode number: %lu\n", (unsigned long)fileStat.st_ino);
+    printf("Number of hard links: %lu\n", (unsigned long)fileStat.st_nlink);
+    printf("File permissions: %o\n", fileStat.st_mode & 0777);
+    printf("File size: %ld bytes\n", (long)fileStat.st_size);
+
+    printf("Last access time: %s", ctime(&fileStat.st_atime));
+    printf("Last modification time: %s", ctime(&fileStat.st_mtime));
+
+    return 0;
+}

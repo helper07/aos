@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    struct stat fileStat;
+    
+    if (stat(argv[1], &fileStat) == -1) {
+        perror("Error getting file information");
+        return 1;
+    }
+
+    if (S_ISREG(fileStat.st_mode)) {
+        printf("Regular file\n");
+    } else if (S_ISDIR(fileStat.st_mode)) {
+        printf("Directory\n");
+    } else if (S_ISCHR(fileStat.st_mode)) {
+        printf("Character special file\n");
+    } else if (S_ISBLK(fileStat.st_mode)) {
+        printf("Block special file\n");
+    } else if (S_ISFIFO(fileStat.st_mode)) {
+        printf("FIFO or pipe\n");
+    } else if (S_ISLNK(fileStat.st_mode)) {
+        printf("Symbolic link\n");
+    } else if (S_ISSOCK(fileStat.st_mode)) {
+        printf("Socket\n");
+    } else {
+        printf("Unknown file type\n");
+    }
+
+    printf("Inode number: %lu\n", (unsigned long)fileStat.st_ino);
+
+    return 0;
+}

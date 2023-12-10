@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+    for (int i = 1; i < argc; ++i) {
+        for (int j = i + 1; j < argc; ++j) {
+            struct stat fileStatI, fileStatJ;
+
+            if (stat(argv[i], &fileStatI) == -1 || stat(argv[j], &fileStatJ) == -1) {
+                perror("Error getting file information");
+                exit(1);
+            }
+
+            if (fileStatI.st_size > fileStatJ.st_size) {
+                // Swap filenames
+                char *temp = argv[i];
+                argv[i] = argv[j];
+                argv[j] = temp;
+            }
+        }
+    }
+
+    for (int i = 1; i < argc; ++i) {
+        printf("%s\n", argv[i]);
+    }
+
+    return 0;
+}

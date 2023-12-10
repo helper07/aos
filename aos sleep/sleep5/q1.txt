@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <dirent.h>
+
+int main() {
+    DIR *dir;
+    struct dirent *entry;
+    int fileCount = 0;
+
+    dir = opendir(".");
+
+    if (dir != NULL) {
+        while ((entry = readdir(dir)) != NULL) {
+            printf("%s\n", entry->d_name);
+            fileCount++;
+        }
+
+        closedir(dir);
+    }
+
+    printf("Number of files: %d\n", fileCount);
+
+    return 0;
+}

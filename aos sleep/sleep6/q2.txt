@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/resource.h>
+
+int main() {
+    int n = 5; // Set the number of child processes
+    pid_t pid;
+    struct rusage usage;
+    int status;
+
+    for (int i = 0; i < n; ++i) {
+        pid = fork();
+
+        if (pid == -1) {
+            perror("Fork error");
+            exit(1);
+        }
+
+        if (pid == 0) {
+            // Child process
+            // Replace this with the desired child process logic
+            exit(0);
+        }
+    }
+
+    // Wait for all child processes to terminate
+    while ((pid = waitpid(-1, &status, 0)) != -1) {
+        if (getrusage(RUSAGE_CHILDREN, &usage) == -1) {
+            perror("getrusage error");
+            exit(1);
+        }
+    }
+
+    printf("Cumulative user time: %ld seconds\n", usage.ru_utime.tv_sec);
+    printf("Cumulative kernel time: %ld seconds\n", usage.ru_stime.tv_sec);
+
+    return 0;
+}

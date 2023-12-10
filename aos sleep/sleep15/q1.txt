@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+int main() {
+    unsigned long n;
+
+    printf("Enter the size threshold (in Bytes): ");
+    scanf("%lu", &n);
+
+    DIR *dir;
+    struct dirent *entry;
+
+    dir = opendir(".");
+
+    if (dir != NULL) {
+        while ((entry = readdir(dir)) != NULL) {
+            struct stat fileStat;
+            char filePath[256];
+
+            if (entry->d_name[0] == '.') {
+                continue; // Skip hidden files
+            }
+
+            snprintf(filePath, sizeof(filePath), "%s/%s", ".", entry->d_name);
+
+            if (stat(filePath, &fileStat) == -1) {
+                perror("Error getting file information");
+                exit(1);
+            }
+
+            if (fileStat.st_size > n) {
+                printf("%s\n", entry->d_name);
+            }
+        }
+
+        closedir(dir);
+    }
+
+    return 0;
+}

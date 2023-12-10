@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <signal.h>
+
+void child_handler(int signum) {
+    if (signum == SIGCHLD) {
+        printf("Child process has terminated.\n");
+    } else if (signum == SIGALRM) {
+        printf("Child process took too long. Killing...\n");
+        kill(getpid(), SIGKILL);
+    }
+}
+
+int main() {
+    pid_t pid;
+
+    signal(SIGCHLD, child_handler);
+    signal(SIGALRM, child_handler);
+
+    pid = fork();
+
+    if (pid == -1) {
+        perror("Fork error");
+        exit(1);
+    }
+
+    if (pid == 0) {
+        // Child process
+        execlp("ls", "ls", "-l", (char *)NULL); // Replace with the desired command
+        perror("Exec error");
+        exit(1);
+    } else {
+        // Parent process
+        alarm(5); // Set an alarm for 5 seconds
+        wait(NULL);
+        printf("Parent process exiting.\n");
+    }
+
+    return 0;
+}

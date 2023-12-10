@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    int pipe_fd[2];
+    pid_t pid;
+
+    pipe(pipe_fd);
+
+    pid = fork();
+
+    if (pid == -1) {
+        perror("Fork error");
+        exit(1);
+    }
+
+    if (pid == 0) {
+        // Child process
+        close(pipe_fd[0]);
+        write(pipe_fd[1], "Hello World\n", 12);
+        write(pipe_fd[1], "Hello SPPU\n", 11);
+        write(pipe_fd[1], "Linux is Funny\n", 16);
+        close(pipe_fd[1]);
+    } else {
+        // Parent process
+        close(pipe_fd[1]);
+
+        char buffer[100];
+        int bytesRead;
+
+        while ((bytesRead = read(pipe_fd[0], buffer, sizeof(buffer))) > 0) {
+            write(STDOUT_FILENO, buffer, bytesRead);
+        }
+
+        close(pipe_fd[0]);
+    }
+
+    return 0;
+}
